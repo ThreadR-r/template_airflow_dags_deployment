@@ -20,6 +20,9 @@ jobs:
 
       - name: Install outils de qualité
         run: pip install uv
+      
+      - name: Installer les dépendances
+        run: uv sync --locked
 
       - name: Analyse statique (ruff)
         run: uvx ruff check src/ --output-format=github
