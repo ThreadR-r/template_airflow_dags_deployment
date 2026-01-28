@@ -22,7 +22,7 @@ jobs:
         run: pip install uv
 
       - name: Analyse statique (ruff)
-        run: uvx ruff src/ --output-format=github
+        run: uvx ruff check src/ --output-format=github
 
       - name: Vérification typage (mypy)
         run: uvx mypy src/
@@ -31,7 +31,7 @@ jobs:
         run: uvx bandit -r src/
 
       - name: Vérification typing (ty)
-        run: uvx ty check
+        run: uvx ty check src/
 
   publish:
     needs: test
