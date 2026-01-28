@@ -1,0 +1,12 @@
+# Fichiers/dossiers à ignorer
+__pycache__/
+*.pyc
+.env
+.venv
+.uv/
+.cache/
+.dag/
+# Airflow
+logs/
+# VSCode
+.vscode/

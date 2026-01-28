@@ -1,0 +1,35 @@
+stages:
+  - quality
+  - publish
+
+variables:
+  SFTP_HOST: "$SFTP_HOST"
+  SFTP_USERNAME: "$SFTP_USERNAME"
+  SFTP_PASSWORD: "$SFTP_PASSWORD"
+  SFTP_PORT: "$SFTP_PORT"
+  SFTP_DAGS_PATH: "$SFTP_DAGS_PATH"
+
+quality:
+  stage: quality
+  image: python:3.12
+  script:
+    - pip install uv
+    - uvx ruff src/ --output-format=github
+    - uvx mypy src/
+    - uvx bandit -r src/
+    - uvx ty check
+  only:
+    - main
+    - merge_requests
+
+publish:
+  stage: publish
+  image: atmoz/sftp
+  dependencies:
+    - quality
+  script:
+    - apk add --no-cache lftp
+    - lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -e "mirror -R src $SFTP_DAGS_PATH; bye" -p $SFTP_PORT $SFTP_HOST
+  only:
+    - main
+  when: on_success
