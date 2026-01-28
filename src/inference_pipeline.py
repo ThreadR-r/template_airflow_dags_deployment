@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.dummy import DummyOperator
+from airflow.providers.standard.operators.empty import EmptyOperator
 from datetime import datetime
 
 default_args = {
@@ -12,11 +12,11 @@ dag = DAG(
     'inference_pipeline',
     default_args=default_args,
     description='Exemple de pipeline d\'inférence',
-    schedule_interval='@hourly',
+    schedule='@hourly',
     catchup=False
 )
 
-start = DummyOperator(task_id='start', dag=dag)
-end = DummyOperator(task_id='end', dag=dag)
+start = EmptyOperator(task_id='start', dag=dag)
+end = EmptyOperator(task_id='end', dag=dag)
 
 start >> end
