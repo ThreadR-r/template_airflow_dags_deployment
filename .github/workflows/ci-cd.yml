@@ -24,14 +24,11 @@ jobs:
       - name: Analyse statique (ruff)
         run: uvx ruff check src/ --output-format=github
 
-      - name: Vérification typage (mypy)
-        run: uvx mypy src/
+      - name: Vérification typage (ty)
+        run: uvx ty check src/
 
       - name: Analyse sécurité (bandit)
         run: uvx bandit -r src/
-
-      - name: Vérification typing (ty)
-        run: uvx ty check src/
 
   publish:
     needs: test
