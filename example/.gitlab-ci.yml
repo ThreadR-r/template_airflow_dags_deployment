@@ -1,0 +1,8 @@
+include:
+  - component: $CI_SERVER_FQDN/my-org/template_airflow_deployment/template/component@1.0.0
+    inputs:
+      SFTP_HOST: "sftp.example.com"
+      SFTP_USERNAME: "user"
+      SFTP_PASSWORD: "password"
+      SFTP_PORT: "22"
+      SFTP_DAGS_PATH: "/remote/dags"
