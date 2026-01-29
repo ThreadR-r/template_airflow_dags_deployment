@@ -1,0 +1,17 @@
+name: Exemple d'utilisation du composant Airflow DAG CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  call-component:
+    uses: ../template/.github/workflows/component.yml@main
+    with:
+      SFTP_HOST: "sftp.example.com"
+      SFTP_USERNAME: "user"
+      SFTP_PASSWORD: "password"
+      SFTP_PORT: "22"
+      SFTP_DAGS_PATH: "/remote/dags"

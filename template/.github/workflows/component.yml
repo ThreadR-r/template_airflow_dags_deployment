@@ -1,0 +1,81 @@
+name: Airflow DAG CI/CD Component
+
+on:
+  workflow_call:
+    inputs:
+      SFTP_HOST:
+        required: true
+        type: string
+      SFTP_USERNAME:
+        required: true
+        type: string
+      SFTP_PASSWORD:
+        required: true
+        type: string
+      SFTP_PORT:
+        required: true
+        type: string
+      SFTP_DAGS_PATH:
+        required: true
+        type: string
+    secrets:
+      GITLAB_TOKEN:
+        required: false
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: pip install uv
+      - name: Lint (ruff)
+        run: |
+          uvx ruff check src/ --output-format=github
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: pip install uv
+      - name: Typing (mypy)
+        run: |
+          uvx mypy src/
+
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: pip install uv
+      - name: Security (bandit)
+        run: |
+          uvx bandit -r src/
+
+  ty:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: pip install uv
+      - name: pyproject.toml check (ty)
+        run: |
+          uvx ty check src/
+
+  publish:
+    needs: [ruff, mypy, bandit, ty]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+      - name: Publish DAGs to SFTP
+        env:
+          SFTP_HOST: ${{ inputs.SFTP_HOST }}
+          SFTP_USERNAME: ${{ inputs.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ inputs.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ inputs.SFTP_PORT }}
+          SFTP_DAGS_PATH: ${{ inputs.SFTP_DAGS_PATH }}
+        run: |
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -e "mirror -R src $SFTP_DAGS_PATH; bye" -p $SFTP_PORT $SFTP_HOST

@@ -43,6 +43,32 @@ include:
 
 Adaptez les variables selon votre environnement et votre organisation.
 
+## Exemple d'inclusion du composant CI/CD (GitHub Actions)
+
+Ajoutez dans votre `.github/workflows/ci.yml` :
+
+```yaml
+name: Exemple d'utilisation du composant Airflow DAG CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  call-component:
+    uses: ../template/.github/workflows/component.yml@main
+    with:
+      SFTP_HOST: "sftp.example.com"
+      SFTP_USERNAME: "user"
+      SFTP_PASSWORD: "password"
+      SFTP_PORT: "22"
+      SFTP_DAGS_PATH: "/remote/dags"
+```
+
+Adaptez les variables selon votre environnement et votre organisation.
+
 ---
 
 *Ce dossier sert d'exemple pour l'utilisation du composant CI/CD fourni dans `template/`.*
