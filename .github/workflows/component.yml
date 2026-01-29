@@ -9,9 +9,6 @@ on:
       SFTP_USERNAME:
         required: true
         type: string
-      SFTP_PASSWORD:
-        required: true
-        type: string
       SFTP_PORT:
         required: true
         type: string
@@ -19,10 +16,28 @@ on:
         required: true
         type: string
     secrets:
-      GITLAB_TOKEN:
-        required: false
+      SFTP_PASSWORD:
+        required: true
+        type: string
 
 jobs:
+  set-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.setenv.outputs.environment }}
+    steps:
+      - id: setenv
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "main" ]]; then
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "production" && "${{ github.head_ref }}" == "main" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/* && "${{ github.ref_protected }}" == 'true' && "${{ github.ref_name }}" == "production" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=undefined" >> $GITHUB_OUTPUT
+          fi
+
   ruff:
     runs-on: ubuntu-latest
     steps:
@@ -66,16 +81,17 @@ jobs:
   publish:
     needs: [ruff, mypy, bandit, ty]
     runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ${{ needs.ruff.outputs.ENVIRONMENT || needs.set-environment.outputs.environment }}
+      SFTP_HOST: ${{ inputs.SFTP_HOST }}
+      SFTP_USERNAME: ${{ inputs.SFTP_USERNAME }}
+      SFTP_PASSWORD: ${{ inputs.SFTP_PASSWORD }}
+      SFTP_PORT: ${{ inputs.SFTP_PORT }}
+      SFTP_DAGS_PATH: ${{ inputs.SFTP_DAGS_PATH }}
     steps:
       - uses: actions/checkout@v4
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
       - name: Publish DAGs to SFTP
-        env:
-          SFTP_HOST: ${{ inputs.SFTP_HOST }}
-          SFTP_USERNAME: ${{ inputs.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ inputs.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ inputs.SFTP_PORT }}
-          SFTP_DAGS_PATH: ${{ inputs.SFTP_DAGS_PATH }}
         run: |
-          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -e "mirror -R src $SFTP_DAGS_PATH; bye" -p $SFTP_PORT $SFTP_HOST
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -e "mirror -R src $SFTP_DAGS_PATH/$ENVIRONMENT; bye" -p $SFTP_PORT $SFTP_HOST

@@ -7,11 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  call-component:
-    uses: ../template/.github/workflows/component.yml@main
+  call-workflow:
+    # uses: ../template/.github/workflows/component.yml@main
+    uses: octo-org/example-repo/.github/workflows/workflow-B.yml@main
     with:
       SFTP_HOST: "sftp.example.com"
       SFTP_USERNAME: "user"
-      SFTP_PASSWORD: "password"
       SFTP_PORT: "22"
       SFTP_DAGS_PATH: "/remote/dags"
+    secrets:
+      SFTP_PASSWORD: "password"
