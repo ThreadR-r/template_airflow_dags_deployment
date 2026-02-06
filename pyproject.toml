@@ -4,9 +4,13 @@ version = "0.1.0"
 description = "Exemple industriel de déploiement de DAGs Airflow avec gestion uv."
 authors = ["Votre Nom <votre.email@example.com>"]
 requires-python = ">=3.8"
+dependencies = [
+    "apache-airflow>=2.10.3",
+]
 
-[project.dependencies]
-apache-airflow = "^2.9.0"
-
-[tool.uv]
-# Configuration optionnelle pour uv
+[dependency-groups]
+dev = [
+    "bandit>=1.7.10",
+    "ruff>=0.15.0",
+    "ty>=0.0.15",
+]

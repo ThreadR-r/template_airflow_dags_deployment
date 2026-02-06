@@ -1,0 +1,55 @@
+name: Airflow DAG CI/CD Component
+
+jobs:
+  set-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.setenv.outputs.environment }}
+    steps:
+      - id: setenv
+        run: |
+          ENV_TYPE="dev"
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "production" && "${{ github.head_ref }}" == "main" ]]; then
+            ENV_TYPE="staging"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/production ]]; then
+            ENV_TYPE="rc"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" =~ refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            ENV_TYPE="release"
+          fi
+          echo "env_type=$ENV_TYPE" >> $GITHUB_OUTPUT
+          echo "Computed environment type: $ENV_TYPE"
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Export and Install project dependencies
+        run: |
+          /root/.local/bin/uv sync --frozen
+
+      - name: Lint with ruff
+        run: /root/.local/bin/uv run --with ruff ruff check src tests
+        continue-on-error: true
+
+      - name: Type check with ty
+        run: /root/.local/bin/uv run --with ty ty check src
+        continue-on-error: true
+
+      - name: Security check with bandit
+        run: /root/.local/bin/uv run --with bandit bandit -r src
+        continue-on-error: true
+
+      # - name: Run TruffleHog
+      #   uses: trufflesecurity/trufflehog@main
+      #   with:
+      #     extra_args: --results=verified,unknown
+
+      - name: Run tests
+        run: |
+          /root/.local/bin/uv run --with pytest pytest tests
