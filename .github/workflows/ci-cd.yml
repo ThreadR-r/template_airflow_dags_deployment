@@ -16,13 +16,14 @@ jobs:
       - name: Compute environment type
         id: setenv
         run: |
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/dev ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/main ]]; then
             ENV_TYPE="dev"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/staging ]]; then
             ENV_TYPE="staging"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/production ]]; then
             ENV_TYPE="production"
           else
+            echo "Unsupported event type or branch: ${GITHUB_EVENT_NAME} on ${GITHUB_REF}"
             exit 1
           fi
           echo "env_type=$ENV_TYPE" >> $GITHUB_OUTPUT
