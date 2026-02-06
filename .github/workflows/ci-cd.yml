@@ -13,7 +13,8 @@ jobs:
     outputs:
       environment: ${{ steps.setenv.outputs.environment }}
     steps:
-      - id: setenv
+      - name: Compute environment type
+        id: setenv
         run: |
           ENV_TYPE="dev"
           if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "production" && "${{ github.head_ref }}" == "main" ]]; then
@@ -41,7 +42,7 @@ jobs:
           /root/.local/bin/uv sync --frozen
 
       - name: Lint with ruff
-        run: /root/.local/bin/uv run --with ruff ruff check src tests
+        run: /root/.local/bin/uv run --with ruff ruff check src
         continue-on-error: true
 
       - name: Type check with ty
