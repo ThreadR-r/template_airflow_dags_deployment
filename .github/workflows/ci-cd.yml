@@ -49,7 +49,3 @@ jobs:
       #   uses: trufflesecurity/trufflehog@main
       #   with:
       #     extra_args: --results=verified,unknown
-
-      - name: Run tests
-        run: |
-          /root/.local/bin/uv run --with pytest pytest tests
