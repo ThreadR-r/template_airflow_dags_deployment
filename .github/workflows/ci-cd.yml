@@ -16,13 +16,14 @@ jobs:
       - name: Compute environment type
         id: setenv
         run: |
-          ENV_TYPE="dev"
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "production" && "${{ github.head_ref }}" == "main" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/dev ]]; then
+            ENV_TYPE="dev"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/staging ]]; then
             ENV_TYPE="staging"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/production ]]; then
-            ENV_TYPE="rc"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" =~ refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            ENV_TYPE="release"
+            ENV_TYPE="production"
+          else
+            exit 1
           fi
           echo "env_type=$ENV_TYPE" >> $GITHUB_OUTPUT
           echo "Computed environment type: $ENV_TYPE"
