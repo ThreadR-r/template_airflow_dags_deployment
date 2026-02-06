@@ -1,5 +1,12 @@
 name: Airflow DAG CI/CD Component
 
+on:
+  push:
+    branches: [ main, production ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main, production ]
+
 jobs:
   set-environment:
     runs-on: ubuntu-latest
