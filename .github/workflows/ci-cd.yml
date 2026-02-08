@@ -2,7 +2,9 @@ name: Airflow DAG CI/CD Component
 
 on:
   push:
-    branches: [ main, staging, production ]
+    branches: [ main, production ]
+  pull_request:
+    branches: [ main, production ]
 
 jobs:
   set-environment:
@@ -13,14 +15,16 @@ jobs:
       - name: Compute environment type
         id: setenv
         run: |
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/main ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "main" ]]; then
             ENV_TYPE="dev"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/staging ]]; then
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/main ]]; then
+            ENV_TYPE="dev"
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "production" && "${{ github.head_ref }}" == "main" ]]; then
             ENV_TYPE="staging"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/production ]]; then
             ENV_TYPE="production"
           else
-            echo "Unsupported event type or branch: ${GITHUB_EVENT_NAME} on ${GITHUB_REF}"
+            echo "Unable to determine environment type for event: ${GITHUB_EVENT_NAME}, ref: ${GITHUB_REF}"
             exit 1
           fi
           echo "environment=$ENV_TYPE" >> $GITHUB_OUTPUT
