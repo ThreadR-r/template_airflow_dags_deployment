@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
-from datetime import datetime
+
+from .environment import ENVIRONMENT
 
 default_args = {
     'owner': 'airflow',
@@ -9,7 +12,7 @@ default_args = {
 }
 
 dag = DAG(
-    'inference_pipeline',
+    f"inference_pipeline_{ENVIRONMENT}",
     default_args=default_args,
     description='Exemple de pipeline d\'inférence',
     schedule='@hourly',

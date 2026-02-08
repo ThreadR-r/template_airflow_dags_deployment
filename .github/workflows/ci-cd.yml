@@ -108,6 +108,10 @@ jobs:
           echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_PRODUCTION }}" >> $GITHUB_ENV
           echo "Loaded SFTP secrets for production environment"
+      - name: Setting environment in src/environment.py
+        run: |
+          echo "ENVIRONMENT='${{ needs.set-environment.outputs.environment }}'" > src/environment.py
+          echo "Set ENVIRONMENT variable in src/environment.py to '${{ needs.set-environment.outputs.environment }}'"
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
