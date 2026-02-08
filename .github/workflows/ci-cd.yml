@@ -41,18 +41,18 @@ jobs:
 
       - name: Export and Install project dependencies
         run: |
-          /root/.local/bin/uv sync --frozen
+          ~/.local/bin/uv sync --frozen
 
       - name: Lint with ruff
-        run: /root/.local/bin/uv run --with ruff ruff check src
+        run: ~/.local/bin/uv run --with ruff ruff check src
         continue-on-error: true
 
       - name: Type check with ty
-        run: /root/.local/bin/uv run --with ty ty check src
+        run: ~/.local/bin/uv run --with ty ty check src
         continue-on-error: true
 
       - name: Security check with bandit
-        run: /root/.local/bin/uv run --with bandit bandit -r src
+        run: ~/.local/bin/uv run --with bandit bandit -r src
         continue-on-error: true
 
       # - name: Run TruffleHog
