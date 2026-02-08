@@ -3,6 +3,7 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.providers.standard.operators.python import PythonOperator
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,6 +24,11 @@ dag = DAG(
 )
 
 start = EmptyOperator(task_id='start', dag=dag)
+hello_world = PythonOperator(
+    task_id='hello_world',
+    python_callable=lambda: print(f"Hello, world! This is the {ENVIRONMENT} environment."),
+    dag=dag
+)
 end = EmptyOperator(task_id='end', dag=dag)
 
-start >> end
+start >> hello_world >> end
