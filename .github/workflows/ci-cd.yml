@@ -110,8 +110,8 @@ jobs:
           echo "Loaded SFTP secrets for production environment"
       - name: Setting environment in src/environment.py
         run: |
-          echo "ENVIRONMENT='${{ needs.set-environment.outputs.environment }}'" > src/environment.py
-          echo "Set ENVIRONMENT variable in src/environment.py to '${{ needs.set-environment.outputs.environment }}'"
+          echo "ENVIRONMENT=${{ needs.set-environment.outputs.environment }}" > src/.env
+          echo "Set ENVIRONMENT variable in src/.env to '${{ needs.set-environment.outputs.environment }}'"
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp

@@ -1,9 +1,12 @@
+import os
 from datetime import datetime
 
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
+from dotenv import load_dotenv
 
-from environment import ENVIRONMENT
+load_dotenv()
+ENVIRONMENT = os.getenv('ENVIRONMENT')
 
 default_args = {
     'owner': 'airflow',
