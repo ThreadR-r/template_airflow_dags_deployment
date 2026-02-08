@@ -2,10 +2,7 @@ name: Airflow DAG CI/CD Component
 
 on:
   push:
-    branches: [ main, production ]
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ main, production ]
+    branches: [ main, staging, production ]
 
 jobs:
   set-environment:
