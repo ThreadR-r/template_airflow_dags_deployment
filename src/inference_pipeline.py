@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
 
-from .environment import ENVIRONMENT
+from environment import ENVIRONMENT
 
 default_args = {
     'owner': 'airflow',
