@@ -105,7 +105,7 @@ jobs:
           echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_PRODUCTION }}" >> $GITHUB_ENV
           echo "Loaded SFTP secrets for production environment"
-      - name: Setting environment in src/environment.py
+      - name: Setting environment in src/.env
         run: |
           echo "ENVIRONMENT=${{ needs.set-environment.outputs.environment }}" > src/.env
           echo "Set ENVIRONMENT variable in src/.env to '${{ needs.set-environment.outputs.environment }}'"
