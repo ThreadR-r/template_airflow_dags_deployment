@@ -70,6 +70,10 @@ jobs:
       - name: Load SFTP secrets for dev
         if: needs.set-environment.outputs.environment == 'dev'
         run: |
+          if [ -z "${{ secrets.SFTP_HOST_DEV }}" ] || [ -z "${{ secrets.SFTP_PORT_DEV }}" ] || [ -z "${{ secrets.SFTP_USER_DEV }}" ] || [ -z "${{ secrets.SFTP_PASSWORD_DEV }}" ] || [ -z "${{ secrets.SFTP_TARGET_DIR_DEV }}" ]; then
+            echo "Missing one or more SFTP_*_DEV secrets (SFTP_HOST_DEV, SFTP_PORT_DEV, SFTP_USER_DEV, SFTP_PASSWORD_DEV, SFTP_TARGET_DIR_DEV)" >&2
+            exit 1
+          fi
           echo "SFTP_HOST=${{ secrets.SFTP_HOST_DEV }}" >> $GITHUB_ENV
           echo "SFTP_PORT=${{ secrets.SFTP_PORT_DEV }}" >> $GITHUB_ENV
           echo "SFTP_USER=${{ secrets.SFTP_USER_DEV }}" >> $GITHUB_ENV
@@ -79,6 +83,10 @@ jobs:
       - name: Load SFTP secrets for staging
         if: needs.set-environment.outputs.environment == 'staging'
         run: |
+          if [ -z "${{ secrets.SFTP_HOST_STAGING }}" ] || [ -z "${{ secrets.SFTP_PORT_STAGING }}" ] || [ -z "${{ secrets.SFTP_USER_STAGING }}" ] || [ -z "${{ secrets.SFTP_PASSWORD_STAGING }}" ] || [ -z "${{ secrets.SFTP_TARGET_DIR_STAGING }}" ]; then
+            echo "Missing one or more SFTP_*_STAGING secrets (SFTP_HOST_STAGING, SFTP_PORT_STAGING, SFTP_USER_STAGING, SFTP_PASSWORD_STAGING, SFTP_TARGET_DIR_STAGING)" >&2
+            exit 1
+          fi
           echo "SFTP_HOST=${{ secrets.SFTP_HOST_STAGING }}" >> $GITHUB_ENV
           echo "SFTP_PORT=${{ secrets.SFTP_PORT_STAGING }}" >> $GITHUB_ENV
           echo "SFTP_USER=${{ secrets.SFTP_USER_STAGING }}" >> $GITHUB_ENV
@@ -88,6 +96,10 @@ jobs:
       - name: Load SFTP secrets for production
         if: needs.set-environment.outputs.environment == 'production'
         run: |
+          if [ -z "${{ secrets.SFTP_HOST_PRODUCTION }}" ] || [ -z "${{ secrets.SFTP_PORT_PRODUCTION }}" ] || [ -z "${{ secrets.SFTP_USER_PRODUCTION }}" ] || [ -z "${{ secrets.SFTP_PASSWORD_PRODUCTION }}" ] || [ -z "${{ secrets.SFTP_TARGET_DIR_PRODUCTION }}" ]; then
+            echo "Missing one or more SFTP_*_PRODUCTION secrets (SFTP_HOST_PRODUCTION, SFTP_PORT_PRODUCTION, SFTP_USER_PRODUCTION, SFTP_PASSWORD_PRODUCTION, SFTP_TARGET_DIR_PRODUCTION)" >&2
+            exit 1
+          fi
           echo "SFTP_HOST=${{ secrets.SFTP_HOST_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_PORT=${{ secrets.SFTP_PORT_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_USER=${{ secrets.SFTP_USER_PRODUCTION }}" >> $GITHUB_ENV
