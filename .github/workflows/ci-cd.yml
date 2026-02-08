@@ -26,7 +26,7 @@ jobs:
             echo "Unsupported event type or branch: ${GITHUB_EVENT_NAME} on ${GITHUB_REF}"
             exit 1
           fi
-          echo "env_type=$ENV_TYPE" >> $GITHUB_OUTPUT
+          echo "environment=$ENV_TYPE" >> $GITHUB_OUTPUT
           echo "Computed environment type: $ENV_TYPE"
 
   tests:
