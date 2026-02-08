@@ -79,6 +79,7 @@ jobs:
           echo "SFTP_USER=${{ secrets.SFTP_USER_DEV }}" >> $GITHUB_ENV
           echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_DEV }}" >> $GITHUB_ENV
           echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_DEV }}" >> $GITHUB_ENV
+          echo "Loaded SFTP secrets for dev environment"
 
       - name: Load SFTP secrets for staging
         if: needs.set-environment.outputs.environment == 'staging'
@@ -92,6 +93,7 @@ jobs:
           echo "SFTP_USER=${{ secrets.SFTP_USER_STAGING }}" >> $GITHUB_ENV
           echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_STAGING }}" >> $GITHUB_ENV
           echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_STAGING }}" >> $GITHUB_ENV
+          echo "Loaded SFTP secrets for staging environment"
 
       - name: Load SFTP secrets for production
         if: needs.set-environment.outputs.environment == 'production'
@@ -105,6 +107,7 @@ jobs:
           echo "SFTP_USER=${{ secrets.SFTP_USER_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_PRODUCTION }}" >> $GITHUB_ENV
           echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_PRODUCTION }}" >> $GITHUB_ENV
+          echo "Loaded SFTP secrets for production environment"
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -112,4 +115,4 @@ jobs:
       - name: Mirror src folder to SFTP
         run: |
           echo "Starting lftp mirror upload to $SFTP_HOST:$SFTP_TARGET_DIR..."
-          lftp -u "$SFTP_USER,$SFTP_PASSWORD" -e "set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=no'; mirror -R src $SFTP_TARGET_DIR; bye" -p "$SFTP_PORT" sftp://$SFTP_HOST
+          lftp -u "$SFTP_USER,$SFTP_PASSWORD" -e "set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=no'; mkdir -p $SFTP_TARGET_DIR; mirror -R src $SFTP_TARGET_DIR; bye" -p "$SFTP_PORT" sftp://$SFTP_HOST
