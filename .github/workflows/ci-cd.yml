@@ -59,3 +59,45 @@ jobs:
       #   uses: trufflesecurity/trufflehog@main
       #   with:
       #     extra_args: --results=verified,unknown
+
+  publish:
+    needs: [set-environment, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Load SFTP secrets for dev
+        if: needs.set-environment.outputs.environment == 'dev'
+        run: |
+          echo "SFTP_HOST=${{ secrets.SFTP_HOST_DEV }}" >> $GITHUB_ENV
+          echo "SFTP_PORT=${{ secrets.SFTP_PORT_DEV }}" >> $GITHUB_ENV
+          echo "SFTP_USER=${{ secrets.SFTP_USER_DEV }}" >> $GITHUB_ENV
+          echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_DEV }}" >> $GITHUB_ENV
+          echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_DEV }}" >> $GITHUB_ENV
+
+      - name: Load SFTP secrets for staging
+        if: needs.set-environment.outputs.environment == 'staging'
+        run: |
+          echo "SFTP_HOST=${{ secrets.SFTP_HOST_STAGING }}" >> $GITHUB_ENV
+          echo "SFTP_PORT=${{ secrets.SFTP_PORT_STAGING }}" >> $GITHUB_ENV
+          echo "SFTP_USER=${{ secrets.SFTP_USER_STAGING }}" >> $GITHUB_ENV
+          echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_STAGING }}" >> $GITHUB_ENV
+          echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_STAGING }}" >> $GITHUB_ENV
+
+      - name: Load SFTP secrets for production
+        if: needs.set-environment.outputs.environment == 'production'
+        run: |
+          echo "SFTP_HOST=${{ secrets.SFTP_HOST_PRODUCTION }}" >> $GITHUB_ENV
+          echo "SFTP_PORT=${{ secrets.SFTP_PORT_PRODUCTION }}" >> $GITHUB_ENV
+          echo "SFTP_USER=${{ secrets.SFTP_USER_PRODUCTION }}" >> $GITHUB_ENV
+          echo "SFTP_PASSWORD=${{ secrets.SFTP_PASSWORD_PRODUCTION }}" >> $GITHUB_ENV
+          echo "SFTP_TARGET_DIR=${{ secrets.SFTP_TARGET_DIR_PRODUCTION }}" >> $GITHUB_ENV
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Mirror src folder to SFTP
+        run: |
+          echo "Starting lftp mirror upload to $SFTP_HOST:$SFTP_TARGET_DIR..."
+          lftp -u "$SFTP_USER,$SFTP_PASSWORD" -e "set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=no'; mirror -R src $SFTP_TARGET_DIR; bye" -p "$SFTP_PORT" sftp://$SFTP_HOST
