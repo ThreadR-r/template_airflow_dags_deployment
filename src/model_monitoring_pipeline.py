@@ -1,6 +1,13 @@
+import os
+from datetime import datetime
+
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
-from datetime import datetime
+from airflow.providers.standard.operators.python import PythonOperator
+from dotenv import load_dotenv
+
+load_dotenv()
+ENVIRONMENT = os.getenv('ENVIRONMENT')
 
 default_args = {
     'owner': 'airflow',
@@ -9,7 +16,7 @@ default_args = {
 }
 
 dag = DAG(
-    'model_monitoring_pipeline',
+    f"model_monitoring_pipeline_{ENVIRONMENT}",
     default_args=default_args,
     description='Exemple de pipeline de monitoring de modèle',
     schedule='@weekly',
@@ -17,6 +24,11 @@ dag = DAG(
 )
 
 start = EmptyOperator(task_id='start', dag=dag)
+hello_world = PythonOperator(
+    task_id='hello_world',
+    python_callable=lambda: print(f"Hello, world! This is the model_monitoring_pipeline from the {ENVIRONMENT} environment."),
+    dag=dag
+)
 end = EmptyOperator(task_id='end', dag=dag)
 
-start >> end
+start >> hello_world >> end
